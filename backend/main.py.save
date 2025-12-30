@@ -1,0 +1,83 @@
+from fastapi import FastAPI
+import socket
+import psutil
+import subprocess
+import ipaddress
+
+app = FastAPI(title="SmartLAN")
+
+
+@app.get("/")
+def root():
+    return {
+        "status": "SmartLAN backend running",
+        "mode": "offline"
+    }
+
+
+@app.get("/network/info")
+def network_info():
+    hostname = socket.gethostname()
+    try:
+        local_ip = socket.gethostbyname(hostname)
+    except Exception:
+        local_ip = "Not found"
+
+    return {
+        "hostname": hostname,
+        "local_ip": local_ip
+    }
+
+
+@app.get("/network/devices")
+def network_devices():
+    devices = []
+
+    for iface, addrs in psutil.net_if_addrs().items():
+        for addr in addrs:
+            if addr.family == socket.AF_INET:
+                devices.append({
+                    "interface": iface,
+                    "ip": addr.address,
+                    "netmask": addr.netmask
+                })
+
+    return {
+        "devices": devices
+    }
+
+
+@app.get("/network/scan")
+def network_scan():
+    local_ip = None
+
+    for iface, addrs in psutil.net_if_addrs().items():
+        for addr in addrs:
+            if addr.family == socket.AF_INET and not addr.address.startswith("127."):
+                local_ip = addr.address
+                break
+        if local_ip:
+            break
+
+    if not local_ip:
+        return {"error": "No LAN IP found"}
+
+    # Scan only first 20 IPs for now (FAST)
+    network = ipaddress.IPv4Network(local_ip + "/24", strict=False)
+    active_hosts = []
+
+    for ip in list(network.hosts())[:20]:
+        ip = str(ip)
+        result = subprocess.run(
+            ["ping", "-c", "1", "-W", "0.2", ip],
+            stdout=subprocess.DEVNULL
+        )
+        if result.returncode == 0:
+            active_hosts.append(ip)
+
+    return {
+        "local_ip": local_ip,
+        "active_hosts": active_hosts,
+        "count": len(active_hosts),
+        "note": "Limited fast scan (first 20 IPs)"
+    }
