@@ -18,7 +18,7 @@ SmartLAN is an open-source software designed to provide efficient management of 
 
 To get started with SmartLAN, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/username/smartlan.git`
+1. Clone the repository: `git clone https://github.com/gaurish676/smartlan.git`
 2. Navigate to the cloned directory: `cd smartlan`
 3. Install dependencies (if any): Refer to the `INSTALL.md` file in the root directory.
 4. Run the application according to your platform-specific instructions.
@@ -26,8 +26,8 @@ To get started with SmartLAN, follow these steps:
 ## Requirements
 
 - Operating System: Windows, macOS, or Linux (64-bit)
-- Programming Language: [Your programming language name here]
-- Version: [Specify the required version if necessary]
+- Programming Language: Python
+- Version: [woks on every]
 - Other Dependencies: List any other dependencies, libraries, or tools required to run the application.
 
 For detailed setup instructions and troubleshooting guides, please refer to the `DOCS` folder in the root directory.
